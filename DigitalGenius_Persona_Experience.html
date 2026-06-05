@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigitalGenius — Find Your Fit</title>
+<style>
+  :root{--bg:#0b0c1a;--ink:#f5f6ff;--muted:#9aa0c8;--accent:#7c5cff;--accent2:#22d3a6;
+    --line:#2a2d4f;--card:#15172b;--warn:#ffb020;--good:#22d3a6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;padding:30px 18px;min-height:100vh}
+  .wrap{max-width:920px;margin:0 auto}
+  .eyebrow{color:var(--accent2);font-weight:700;font-size:12px;letter-spacing:.13em;text-transform:uppercase}
+  h1{font-size:34px;font-weight:900;letter-spacing:-.02em;margin:8px 0}
+  @media(max-width:600px){h1{font-size:26px}}
+  .lede{color:var(--muted);font-size:16px;max-width:620px}
+  /* progress */
+  .steps{display:flex;gap:8px;margin:26px 0 22px}
+  .steps .s{flex:1;height:5px;border-radius:5px;background:#23254e}
+  .steps .s.on{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .stage{display:none;animation:fade .35s ease}
+  .stage.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* persona cards */
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:.15s}
+  .pcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .pcard .pi{font-size:26px}
+  .pcard .pn{font-weight:800;font-size:15px;margin-top:8px}
+  .pcard .pr{font-size:12.5px;color:var(--muted);margin-top:3px}
+  /* case study */
+  .cs{background:linear-gradient(180deg,#16182e,#101225);border:1px solid var(--line);border-radius:20px;padding:28px;margin-top:6px}
+  .cs .brand{display:inline-block;background:#22d3a615;border:1px solid #22d3a644;color:var(--accent2);font-weight:800;font-size:12px;letter-spacing:.05em;padding:5px 12px;border-radius:999px;text-transform:uppercase}
+  .cs h2{font-size:24px;font-weight:800;margin:12px 0 4px;letter-spacing:-.01em}
+  .cs .ctx{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+  .metric{background:#ffffff08;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .metric b{display:block;font-size:26px;font-weight:900;color:var(--accent2);letter-spacing:-.02em}
+  .metric span{font-size:12px;color:var(--muted)}
+  .cs .quote{border-left:3px solid var(--accent);padding-left:14px;font-size:14.5px;color:#dfe2ff;font-style:italic;margin-bottom:6px}
+  .cs .src{font-size:11.5px}.cs .src a{color:var(--muted)}
+  /* questions */
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:14px}
+  .q .qt{font-weight:800;font-size:16px;margin-bottom:4px}
+  .q .qh{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  @media(max-width:560px){.opts{grid-template-columns:1fr}}
+  .opt{background:#1d1f3a;border:1px solid var(--line);border-radius:11px;padding:12px 14px;cursor:pointer;font-size:14px;font-weight:600;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:transparent;background:linear-gradient(135deg,#2a1f5e,#1c2f3e);box-shadow:0 0 0 1px var(--accent2)}
+  input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));outline:none;margin-top:6px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer}
+  .rngval{float:right;color:var(--accent2);font-weight:800;font-variant-numeric:tabular-nums}
+  /* results */
+  .rcard{background:linear-gradient(135deg,#2a1f5e,#16314a);border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:14px}
+  .rcard h2{font-size:22px;font-weight:800}
+  .bigstat{font-size:46px;font-weight:900;color:var(--accent2);letter-spacing:-.02em;margin:6px 0}
+  .rkpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:8px}
+  .rkpi{background:#ffffff10;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .rkpi b{display:block;font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+  .rkpi span{font-size:12px;color:#cfd3ff}
+  .reco{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:14px}
+  .reco .rl{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin-bottom:8px}
+  .reco p{font-size:15px;color:#dfe2ff;margin-bottom:10px}
+  .reco .obj{border-left:3px solid var(--warn);padding-left:13px}
+  .reco .obj .q2{color:var(--warn);font-weight:700;font-size:13.5px}
+  .reco .obj .a2{font-size:14px;color:#dfe2ff;margin-top:3px}
+  /* buttons */
+  .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0b0c1a;font-weight:800;font-size:15px;padding:13px 24px;border-radius:999px;border:none;cursor:pointer;text-decoration:none;display:inline-block}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .nav{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap}
+  .back{color:var(--muted);background:none;border:none;cursor:pointer;font-size:14px;font-weight:600}
+  .disc{font-size:11px;color:#6c719c;margin-top:24px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">DigitalGenius · Personalized Fit Assessment</div>
+  <h1 id="title">Which seat are you in?</h1>
+  <p class="lede" id="lede">Pick your role. We'll show you a real DigitalGenius customer like you, then ask a few quick questions to size the opportunity for <em>your</em> operation.</p>
+
+  <div class="steps"><div class="s on" id="s0"></div><div class="s" id="s1"></div><div class="s" id="s2"></div><div class="s" id="s3"></div></div>
+
+  <!-- STAGE 0: persona -->
+  <div class="stage show" id="stage0">
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+
+  <!-- STAGE 1: case study -->
+  <div class="stage" id="stage1">
+    <div class="cs" id="csbox"></div>
+    <div class="nav">
+      <button class="back" onclick="go(0)">← Change role</button>
+      <button class="btn" onclick="go(2)">This sounds like us → size it for me</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2: diagnostic -->
+  <div class="stage" id="stage2">
+    <div id="qbox"></div>
+    <div class="nav">
+      <button class="back" onclick="go(1)">← Back</button>
+      <button class="btn" id="seeResults" onclick="computeAndShow()">See my results →</button>
+    </div>
+  </div>
+
+  <!-- STAGE 3: results -->
+  <div class="stage" id="stage3">
+    <div id="rbox"></div>
+    <div class="nav">
+      <button class="back" onclick="go(2)">← Adjust my answers</button>
+      <a class="btn" href="https://www.digitalgenius.com/speak-to-us" target="_blank" rel="noopener">Book a demo with these numbers</a>
+    </div>
+    <p class="disc">Benchmarks (40–88% automation, 90%+ resolution, 95% CSAT, 600%+ ROI, 80% of order-status inquiries auto-resolved) are drawn from published DigitalGenius customer case studies and are illustrative, not guaranteed. Your figures are directional estimates to frame a conversation, not a quote. Sales-enablement prototype.</p>
+  </div>
+</div>
+
+<script>
+/* ---------- DATA ---------- */
+const personas={
+ cx:{pi:'👑',pn:'VP / Dir of CX',pr:'You own CSAT, volume & headcount',
+   cs:{brand:'G-Star RAW',title:'Hit a 95% CSAT goal while automating 40% of contacts',
+     ctx:'The global denim brand integrated DigitalGenius with Salesforce and its shipping carriers across English, Dutch and German.',
+     metrics:[['40%','of tickets resolved, zero agents'],['90%+','resolution rate'],['95%','CSAT goal hit'],['60%','faster reply time']],
+     quote:'Repetitive tickets are resolved in seconds, so agents focus on the conversations that actually build loyalty.',
+     url:'https://www.digitalgenius.com/customers/gstar'},
+   challenge:{qt:'What is hurting your CX team most right now?',opts:[
+     'CSAT slipping during peak / volume spikes','Agents buried in WISMO & repetitive tickets',
+     'Can\'t get headcount approved','Inconsistent answers across agents']},
+   obj:{q:'"We tried a chatbot before and it was terrible."',
+     a:'DG doesn\'t deflect — it resolves. A bot tells customers to check their email; DG pulls live carrier data and closes the ticket. G-Star reached 90%+ resolution, not 10% deflection.'}},
+ cfo:{pi:'💰',pn:'CFO / VP Finance',pr:'You approve or kill the spend',
+   cs:{brand:'air up',title:'600%+ ROI with 88% of conversations automated',
+     ctx:'The viral DTC beverage brand deployed DigitalGenius and automated 20+ distinct customer use cases.',
+     metrics:[['600%+','return on investment'],['88%','of conversations automated'],['50→70%','CSAT increase'],['20+','use cases automated']],
+     quote:'Support cost stopped scaling linearly with order volume — it became a fixed cost that absorbs growth.',
+     url:'https://www.digitalgenius.com/customers/airup'},
+   challenge:{qt:'What does the board push you on?',opts:[
+     'Support cost scaling with revenue','Seasonal hiring blowing the budget',
+     'No clear payback on software spend','Headcount requests you can\'t approve']},
+   obj:{q:'"There\'s no public pricing — what will this actually cost?"',
+     a:'Pricing is usage-based and scoped to your volume. We put the business case in writing before you commit: ticket cost × volume × automation rate, with payback period. air up hit 600%+ ROI — model yours below.'}},
+ cto:{pi:'🔧',pn:'CTO / VP Eng',pr:'You judge integration risk',
+   cs:{brand:'ON Running',title:'80% of order-status inquiries auto-resolved with only 10% more agent time',
+     ctx:'The Swiss performance brand handles massive global volume across multiple carrier systems and languages — without an internal engineering build.',
+     metrics:[['80%','of order-status inquiries auto-resolved'],['64%','of order updates handled'],['+10%','agent time as volume grew'],['<1 day','resolution, even at peak']],
+     quote:'DigitalGenius built the carrier, platform and OMS integrations — ON\'s engineers didn\'t.',
+     url:'https://digitalgenius.com/customer/on-running/'},
+   challenge:{qt:'What\'s your biggest integration worry?',opts:[
+     '"Seamless" integrations that become 6-month projects','Customer PII / data security & compliance',
+     'Maintaining yet another tool in the stack','Eng resources pulled onto vendor setup']},
+   obj:{q:'"Your partner integrations aren\'t always plug-and-play."',
+     a:'Deep live-data integrations are harder than reading FAQ articles — that\'s the cost of resolution over deflection. Our team builds and owns the configuration. Standard systems connect in ~30 min; full deployment in 2–4 weeks.'}},
+ coo:{pi:'📦',pn:'COO / VP Ops',pr:'You own efficiency & scale',
+   cs:{brand:'Grenade',title:'One-touch tickets that held up through a warehouse crisis',
+     ctx:'The UK nutrition brand automated repetitive tickets so agents could go above and beyond — and stayed resilient when a 2024 warehouse issue spiked volume.',
+     metrics:[['1-touch','ticket resolution'],['Peak','volume absorbed, no panic-hire'],['Strong','Trustpilot maintained'],['0','seasonal ramp time']],
+     quote:'When the warehouse issue hit, automation absorbed the spike and the Trustpilot score held.',
+     url:'https://www.digitalgenius.com/customers/grenade'},
+   challenge:{qt:'Where does your operation strain most?',opts:[
+     'Peak-season chaos (BFCM, launches)','Linear headcount growth with volume',
+     'Inconsistent resolution quality','Proving efficiency to the board / investors']},
+   obj:{q:'"What happens to my agents?"',
+     a:'They stop doing data entry and handle the work that builds loyalty. DG absorbs the repetitive volume — including crisis spikes — so you scale output without scaling headcount.'}},
+ ecom:{pi:'🎯',pn:'Head of Ecom / CDO',pr:'You own the journey & LTV',
+   cs:{brand:'air up',title:'CSAT 50%→70% by turning post-purchase friction into retention',
+     ctx:'air up automated 20+ use cases and used proactive, on-brand resolution to protect the post-purchase experience that drives repeat purchase.',
+     metrics:[['+20 pts','CSAT (50%→70%)'],['88%','of conversations automated'],['600%+','ROI'],['20+','journeys automated']],
+     quote:'Resolving the ticket AND sending an on-brand apology with a loyalty credit — automatically — is retention, not support.',
+     url:'https://www.digitalgenius.com/customers/airup'},
+   challenge:{qt:'What\'s threatening customer lifetime value?',opts:[
+     'Post-purchase friction killing repeat rate','WISMO / returns hurting the experience',
+     'Digital CX lagging the brand & product','Competitors with a better post-purchase']},
+   obj:{q:'"We already use Gorgias/Zendesk — why add a layer?"',
+     a:'DG layers on top of your helpdesk; it doesn\'t replace it. You keep your systems, and the AI resolves — and proactively reaches out — before tickets reach an agent. That\'s the LTV lever.'}},
+};
+
+/* benchmark automation rate used to size opportunity (conservative, full-resolution) */
+const BENCH=0.45;
+
+let state={persona:null,vol:120000,rep:55,cpt:11,setup:null,challenge:null};
+
+/* ---------- RENDER ---------- */
+const pgrid=document.getElementById('pgrid');
+Object.entries(personas).forEach(([k,p])=>{
+  const c=document.createElement('div');c.className='pcard';
+  c.innerHTML=`<div class="pi">${p.pi}</div><div class="pn">${p.pn}</div><div class="pr">${p.pr}</div>`;
+  c.onclick=()=>{state.persona=k;renderCase();go(1);};
+  pgrid.appendChild(c);
+});
+
+function renderCase(){
+  const p=personas[state.persona];const c=p.cs;
+  document.getElementById('csbox').innerHTML=`
+    <span class="brand">Customer like you · ${c.brand}</span>
+    <h2>${c.title}</h2>
+    <div class="ctx">${c.ctx}</div>
+    <div class="metrics">${c.metrics.map(m=>`<div class="metric"><b>${m[0]}</b><span>${m[1]}</span></div>`).join('')}</div>
+    <div class="quote">${c.quote}</div>
+    <div class="src"><a href="${c.url}" target="_blank" rel="noopener">Read the ${c.brand} case study →</a></div>`;
+}
+
+function renderQuestions(){
+  const p=personas[state.persona];
+  document.getElementById('qbox').innerHTML=`
+   <div class="q">
+     <div class="qt">Roughly how many support tickets do you handle per month?</div>
+     <div class="qh">All inbound contacts across channels. <span class="rngval" id="vV"></span></div>
+     <input type="range" id="vol" min="5000" max="500000" step="5000" value="${state.vol}">
+   </div>
+   <div class="q">
+     <div class="qt">What share is repetitive — WISMO, returns, order edits?</div>
+     <div class="qh">The portion an AI agent can resolve end-to-end. <span class="rngval" id="rV"></span></div>
+     <input type="range" id="rep" min="20" max="80" step="1" value="${state.rep}">
+   </div>
+   <div class="q">
+     <div class="qt">Fully-loaded cost per human-handled ticket?</div>
+     <div class="qh">Typical ecommerce range is $8–15. <span class="rngval" id="cV"></span></div>
+     <input type="range" id="cpt" min="5" max="20" step="0.5" value="${state.cpt}">
+   </div>
+   <div class="q">
+     <div class="qt">What are you running today?</div>
+     <div class="qh">Be honest — it changes our recommendation.</div>
+     <div class="opts" id="setupOpts">
+       ${['Human agents only','Helpdesk + a basic bot','A self-serve / FAQ AI tool','Nothing structured yet'].map(o=>`<div class="opt" data-g="setup" data-v="${o}">${o}</div>`).join('')}
+     </div>
+   </div>
+   <div class="q">
+     <div class="qt">${p.challenge.qt}</div>
+     <div class="qh">Pick the one that stings most.</div>
+     <div class="opts" id="chOpts">
+       ${p.challenge.opts.map(o=>`<div class="opt" data-g="challenge" data-v="${o}">${o}</div>`).join('')}
+     </div>
+   </div>`;
+  // sliders
+  const bind=(id,key,fmt)=>{const el=document.getElementById(id);const lab=document.getElementById({vol:'vV',rep:'rV',cpt:'cV'}[id]);
+    const upd=()=>{state[key]=+el.value;lab.textContent=fmt(+el.value);};el.oninput=upd;upd();};
+  bind('vol','vol',v=>v.toLocaleString()+' /mo');
+  bind('rep','rep',v=>v+'%');
+  bind('cpt','cpt',v=>'$'+v.toFixed(2));
+  // options
+  document.querySelectorAll('#qbox .opt').forEach(o=>{
+    if(state[o.dataset.g]===o.dataset.v)o.classList.add('sel');
+    o.onclick=()=>{document.querySelectorAll(`.opt[data-g="${o.dataset.g}"]`).forEach(x=>x.classList.remove('sel'));
+      o.classList.add('sel');state[o.dataset.g]=o.dataset.v;checkReady();};
+  });
+  checkReady();
+}
+function checkReady(){
+  document.getElementById('seeResults').disabled=!(state.setup&&state.challenge);
+}
+
+function computeAndShow(){
+  const p=personas[state.persona];
+  const annual=state.vol*12;
+  const automatable=state.vol*(state.rep/100);
+  const autoRate=Math.min(state.rep/100, BENCH+0.0); // resolved share of total, capped by repetitive share
+  const deflectedMo=state.vol*Math.min(state.rep/100,BENCH);
+  const savedMo=deflectedMo*state.cpt;
+  const savedYr=savedMo*12;
+  const hoursMo=deflectedMo*8/60; // ~8 min/ticket
+  const fmt=n=>'$'+Math.round(n).toLocaleString();
+
+  // setup-aware line
+  const setupMsg={
+    'Human agents only':'You\'re paying humans for work that resolves itself. The savings below are pure margin you\'re leaving on the table today.',
+    'Helpdesk + a basic bot':'Your bot likely deflects, not resolves. The gap between deflection and end-to-end resolution is exactly the automation you\'re missing.',
+    'A self-serve / FAQ AI tool':'FAQ AI answers questions; it doesn\'t take actions. DigitalGenius issues the refund and generates the label — that\'s why resolution rates jump.',
+    'Nothing structured yet':'Starting from scratch means fastest time-to-value — Genius Flows go live in days, not quarters.'
+  }[state.setup];
+
+  document.getElementById('rbox').innerHTML=`
+    <div class="rcard">
+      <h2>Your automation opportunity</h2>
+      <div class="bigstat">${fmt(savedYr)}<span style="font-size:18px;color:#cfd3ff">/yr</span></div>
+      <div style="color:#cfd3ff;font-size:14px">in labor cost you could redirect — based on resolving ${Math.round(Math.min(state.rep,BENCH*100))}% of your ${state.vol.toLocaleString()} monthly tickets end-to-end, in line with ${p.cs.brand}.</div>
+      <div class="rkpis">
+        <div class="rkpi"><b>${Math.round(deflectedMo).toLocaleString()}</b><span>tickets auto-resolved / mo</span></div>
+        <div class="rkpi"><b>${Math.round(hoursMo).toLocaleString()}</b><span>agent hours freed / mo</span></div>
+        <div class="rkpi"><b>${fmt(savedMo)}</b><span>saved / mo</span></div>
+        <div class="rkpi"><b>2–4 wk</b><span>to go live</span></div>
+      </div>
+    </div>
+    <div class="reco">
+      <div class="rl">What we'd focus on for you</div>
+      <p><strong>Your stated challenge:</strong> ${state.challenge}. ${setupMsg}</p>
+      <p>Given that, we'd start with your highest-volume driver and stand up a Genius Flow that resolves it end-to-end — pulling live order and carrier data, taking the action (refund, label, replacement), and escalating only the genuine edge cases. ${p.cs.brand} is the closest proof point to your operation.</p>
+      <div class="obj">
+        <div class="q2">${p.obj.q}</div>
+        <div class="a2">${p.obj.a}</div>
+      </div>
+    </div>`;
+  go(3);
+}
+
+/* ---------- NAV ---------- */
+const titles=['Which seat are you in?','Meet a customer like you','A few quick questions','Here\'s your fit'];
+const ledes=['Pick your role. We\'ll match you to a real DigitalGenius customer, then size the opportunity for your operation.',
+  'These are real, published results from a brand with your priorities. If it resonates, let\'s make it specific to you.',
+  'Five quick inputs. Everything stays in your browser — nothing is sent anywhere.',
+  'A directional estimate based on your inputs and a comparable customer. Bring it to a demo and we\'ll firm it up.'];
+function go(n){
+  for(let i=0;i<4;i++){document.getElementById('stage'+i).classList.toggle('show',i===n);
+    document.getElementById('s'+i).classList.toggle('on',i<=n);}
+  document.getElementById('title').textContent=titles[n];
+  document.getElementById('lede').innerHTML=ledes[n];
+  if(n===2)renderQuestions();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
