@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigitalGenius ROI Calculator</title>
+<style>
+  :root{
+    --bg:#0f1020; --panel:#1a1c33; --panel2:#23254180; --ink:#f4f5ff;
+    --muted:#9aa0c8; --accent:#7c5cff; --accent2:#22d3a6; --line:#2c2f52;
+    --warn:#ffb020;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:radial-gradient(1200px 600px at 70% -10%, #2a1f5e33, transparent),var(--bg);
+    color:var(--ink);min-height:100vh;padding:32px 20px;}
+  .wrap{max-width:1080px;margin:0 auto}
+  header{margin-bottom:8px}
+  .badge{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--accent2);margin-bottom:8px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin-top:6px;font-size:15px;max-width:620px}
+  .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:22px;margin-top:28px}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,#1c1e38,#16182c);border:1px solid var(--line);
+    border-radius:18px;padding:24px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:18px}
+  .field{margin-bottom:20px}
+  .field label{display:flex;justify-content:space-between;align-items:baseline;
+    font-size:14px;font-weight:600;margin-bottom:8px}
+  .field .val{color:var(--accent2);font-weight:800;font-variant-numeric:tabular-nums}
+  input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:6px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;
+    border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer;box-shadow:0 2px 8px #0008}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  /* results */
+  .hero-num{font-size:30px;font-weight:900;letter-spacing:-.02em}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+  .kpi{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .kpi .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .kpi .v{font-size:26px;font-weight:900;margin-top:6px;font-variant-numeric:tabular-nums}
+  .kpi.big{grid-column:1/3;background:linear-gradient(135deg,#2a1f5e,#1c2f3e)}
+  .kpi.big .v{font-size:40px;color:var(--accent2)}
+  .row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .row:last-child{border-bottom:none}
+  .row .lbl{color:var(--muted)}
+  .row .amt{font-weight:700;font-variant-numeric:tabular-nums}
+  .pos{color:var(--accent2)} .neg{color:var(--warn)}
+  .footnote{font-size:11.5px;color:var(--muted);margin-top:18px;line-height:1.6}
+  .pill{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .pill button{background:#23254e;border:1px solid var(--line);color:var(--ink);
+    font-size:12px;font-weight:600;padding:7px 12px;border-radius:999px;cursor:pointer}
+  .pill button:hover{border-color:var(--accent)}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">DigitalGenius · Business Case</div>
+    <h1>Customer Service Automation ROI Calculator</h1>
+    <p class="sub">Built for the buying committee — drag the inputs to model cost savings, payback period, and ROI for an enterprise DTC brand. Defaults reflect a high-volume brand (ON Running / Universal Music scale).</p>
+    <div class="pill">
+      <span style="color:var(--muted);font-size:12px;align-self:center">Presets:</span>
+      <button onclick="preset('ent')">Enterprise</button>
+      <button onclick="preset('mid')">Mid-market</button>
+      <button onclick="preset('peak')">Peak-season</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <div class="card">
+      <h2>Your Inputs</h2>
+
+      <div class="field">
+        <label>Annual ticket volume <span class="val" id="v_vol"></span></label>
+        <input type="range" id="vol" min="100000" max="3000000" step="50000">
+        <div class="hint">Total inbound contacts handled per year.</div>
+      </div>
+
+      <div class="field">
+        <label>Fully-loaded cost per human-handled ticket <span class="val" id="v_cpt"></span></label>
+        <input type="range" id="cpt" min="5" max="20" step="0.5">
+        <div class="hint">Typical range for a human-handled ecommerce ticket is $8–15.</div>
+      </div>
+
+      <div class="field">
+        <label>Automation rate <span class="val" id="v_auto"></span></label>
+        <input type="range" id="auto" min="20" max="70" step="1">
+        <div class="hint">Share of contacts fully resolved by AI. DG customers commonly reach 40–60%.</div>
+      </div>
+
+      <div class="field">
+        <label>Resolution rate on automated tickets <span class="val" id="v_res"></span></label>
+        <input type="range" id="res" min="70" max="98" step="1">
+        <div class="hint">Quality guardrail — only resolved contacts count as deflected.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>DigitalGenius annual subscription <span class="val" id="v_sub"></span></label>
+        <input type="range" id="sub" min="50000" max="600000" step="10000">
+        <div class="hint">All-in platform cost. Pre-built integrations included at no charge.</div>
+      </div>
+
+      <div class="field">
+        <label>Fully-loaded agent cost (annual) <span class="val" id="v_agent"></span></label>
+        <input type="range" id="agent" min="35000" max="90000" step="1000">
+        <div class="hint">Used to translate savings into agent FTE capacity.</div>
+      </div>
+
+      <div class="field">
+        <label>Avg. tickets per agent per year <span class="val" id="v_tpa"></span></label>
+        <input type="range" id="tpa" min="4000" max="16000" step="500">
+        <div class="hint">Throughput assumption for FTE math.</div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="card">
+      <h2>The Business Case</h2>
+      <div class="kpis">
+        <div class="kpi big">
+          <div class="k">First-year ROI</div>
+          <div class="v" id="r_roi"></div>
+        </div>
+        <div class="kpi">
+          <div class="k">Net annual savings</div>
+          <div class="v pos" id="r_net"></div>
+        </div>
+        <div class="kpi">
+          <div class="k">Payback period</div>
+          <div class="v" id="r_pay"></div>
+        </div>
+        <div class="kpi">
+          <div class="k">Tickets deflected / yr</div>
+          <div class="v" id="r_tix"></div>
+        </div>
+        <div class="kpi">
+          <div class="k">Agent capacity freed</div>
+          <div class="v" id="r_fte"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="row"><span class="lbl">Gross labor cost avoided</span><span class="amt pos" id="r_gross"></span></div>
+      <div class="row"><span class="lbl">Less: DigitalGenius subscription</span><span class="amt neg" id="r_subline"></span></div>
+      <div class="row"><span class="lbl">Net annual benefit</span><span class="amt pos" id="r_net2"></span></div>
+      <div class="row"><span class="lbl">3-year cumulative net</span><span class="amt pos" id="r_3yr"></span></div>
+      <div class="row"><span class="lbl">Effective cost per deflected ticket</span><span class="amt" id="r_cpd"></span></div>
+
+      <p class="footnote">
+        Deflected tickets = volume × automation rate × resolution rate. Gross savings = deflected tickets × cost per human ticket. ROI = net benefit ÷ subscription. This models direct labor savings only — it excludes CSAT-driven retention, LTV, and peak-season hiring avoidance, which strengthen the case for the COO and Head of Ecommerce. Figures are estimates for discussion, not a quote.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ids=['vol','cpt','auto','res','sub','agent','tpa'];
+  const presets={
+    ent:{vol:1000000,cpt:12,auto:50,res:92,sub:300000,agent:55000,tpa:9000},
+    mid:{vol:250000,cpt:10,auto:45,res:90,sub:120000,agent:50000,tpa:8000},
+    peak:{vol:1500000,cpt:14,auto:55,res:90,sub:350000,agent:60000,tpa:7500}
+  };
+  const $=id=>document.getElementById(id);
+  const usd=n=>'$'+Math.round(n).toLocaleString();
+  const usd2=n=>'$'+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  const num=n=>Math.round(n).toLocaleString();
+
+  function preset(p){const s=presets[p];ids.forEach(i=>$(i).value=s[i]);calc();}
+
+  function calc(){
+    const vol=+$('vol').value, cpt=+$('cpt').value, auto=+$('auto').value/100,
+          res=+$('res').value/100, sub=+$('sub').value, agent=+$('agent').value, tpa=+$('tpa').value;
+
+    // input labels
+    $('v_vol').textContent=num(vol);
+    $('v_cpt').textContent=usd2(cpt);
+    $('v_auto').textContent=(auto*100).toFixed(0)+'%';
+    $('v_res').textContent=(res*100).toFixed(0)+'%';
+    $('v_sub').textContent=usd(sub);
+    $('v_agent').textContent=usd(agent);
+    $('v_tpa').textContent=num(tpa);
+
+    const deflected=vol*auto*res;
+    const gross=deflected*cpt;
+    const net=gross-sub;
+    const roi=net/sub*100;
+    const paybackMonths=gross>0?(sub/(gross/12)):0;
+    const fte=deflected/tpa;
+    const cpd=deflected>0?sub/deflected:0;
+
+    $('r_roi').textContent=(roi>=0?'':'-')+Math.abs(Math.round(roi)).toLocaleString()+'%';
+    $('r_net').textContent=usd(net);
+    $('r_pay').textContent=paybackMonths<12?paybackMonths.toFixed(1)+' mo':(paybackMonths/12).toFixed(1)+' yr';
+    $('r_tix').textContent=num(deflected);
+    $('r_fte').textContent=fte.toFixed(1)+' FTE';
+    $('r_gross').textContent=usd(gross);
+    $('r_subline').textContent='−'+usd(sub);
+    $('r_net2').textContent=usd(net);
+    $('r_3yr').textContent=usd(gross*3-sub*3);
+    $('r_cpd').textContent=usd2(cpd);
+  }
+  ids.forEach(i=>$(i).addEventListener('input',calc));
+  preset('ent');
+</script>
+</body>
+</html>
